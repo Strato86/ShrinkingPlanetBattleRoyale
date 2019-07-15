@@ -35,5 +35,6 @@ MonoBehaviour:
   - AddPlayer
   - SetReferenceToSeld
   - SetReferenceToSelf
+  - RequestMove
   DisableAutoOpenWizard: 1
   ShowSettings: 0

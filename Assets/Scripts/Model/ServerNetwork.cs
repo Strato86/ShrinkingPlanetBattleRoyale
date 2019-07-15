@@ -57,5 +57,19 @@ public class ServerNetwork : MonoBehaviourPun
         }
     }
 
+    //De ahora en mas son comandos para mover a los players
 
+    [PunRPC]
+    void RequestMove(Vector3 dir, Player p)
+    {
+        if (!_view.IsMine)
+            return;
+        if (players.ContainsKey(p))
+            players[p].Move(dir);
+    }
+
+    public void PlayerRequestMove(Vector3 dir, Player p)
+    {
+
+    }
 }
