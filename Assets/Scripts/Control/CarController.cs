@@ -28,7 +28,12 @@ public class CarController : MonoBehaviourPun
         if(!photonView.IsMine && GetComponent<Controller>()) 
         {
             Destroy(GetComponent<Controller>());
-         }
+        }
+        if (photonView.IsMine)
+        {
+            ServerNetwork.instance.photonView.RPC("AddPlayer", ServerNetwork.instance.serverReference, PhotonNetwork.LocalPlayer, this); //Call server to add player
+        }
+        
     }
 
     /*private void Update()

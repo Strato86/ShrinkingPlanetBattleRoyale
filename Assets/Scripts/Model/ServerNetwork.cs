@@ -36,20 +36,13 @@ public class ServerNetwork : MonoBehaviourPun
     {
         instance = this;
         serverReference = p;
-        if (!PhotonNetwork.IsMasterClient)
-        {
-            _view.RPC("AddPlayer", serverReference, PhotonNetwork.LocalPlayer); //Call server to add player
-        }
     }
 
     [PunRPC]
-    public void AddPlayer(Player p)
+    public void AddPlayer(Player p, CarController newPlayer)
     {
         if (!_view.IsMine)
             return;
-        var newPlayer = PhotonNetwork.Instantiate("Player",
-                        new Vector3(Random.Range(0, 3), Random.Range(0, 3), Random.Range(0, 3)),
-                        Quaternion.identity).GetComponent<CarController>();
         players.Add(p, newPlayer);
         foreach(var item in players)
         {

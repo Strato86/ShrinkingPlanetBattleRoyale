@@ -189,7 +189,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 553f7e2339758ca4fb3107b5812cc452, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shrinkSpeed: 0.999902
+  shrinkSpeed: 0.999995
   minSize: 15
 --- !u!135 &353500057
 SphereCollider:
