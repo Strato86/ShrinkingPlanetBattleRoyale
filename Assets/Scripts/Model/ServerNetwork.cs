@@ -70,6 +70,6 @@ public class ServerNetwork : MonoBehaviourPun
 
     public void PlayerRequestMove(Vector3 dir, Player p)
     {
-
+        _view.RPC("RequestMove", serverReference,dir, p);
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class CarController : MonoBehaviour
+public class CarController : MonoBehaviourPun
 {
     public PlanetManager planet;
     public float speed;
@@ -23,6 +24,11 @@ public class CarController : MonoBehaviour
             planet = GameMasterManager.instance.GetPlanet();
         }
         _rb = GetComponent<Rigidbody>();
+
+        if(!photonView.IsMine && GetComponent<Controller>()) 
+        {
+            Destroy(GetComponent<Controller>());
+         }
     }
 
     /*private void Update()

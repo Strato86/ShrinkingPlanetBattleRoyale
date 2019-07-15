@@ -8,12 +8,28 @@ using UnityEngine.SceneManagement;
 
 public class PhotonNetworkController : MonoBehaviourPunCallbacks
 {
+    public static PhotonNetworkController instance { get; private set; } //Singleton
+
     private bool isHost;
     private int _playerCount;
 
     public Text playerCount;
     public byte maxPlayersPerRoom = 8;
     public byte minPlayersToStartGame = 1;
+
+    public bool isServer;
+
+    private void Awake()
+    {
+        if(instance == null)
+        {
+            instance = this;
+        }
+        else 
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
@@ -63,14 +79,15 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     /// </summary>
     public override void OnJoinedRoom()
     {
-        if (isHost)
+        /*if (isHost)
         {
             PhotonNetwork.Instantiate("ServerNetwork", Vector3.zero, Quaternion.identity);
         }
         else
         {
             PhotonNetwork.Instantiate("Controller", Vector3.zero, Quaternion.identity);
-        }
+        }*/
+        isServer = isHost;
         playerCount.enabled = true;
         if(_playerCount >= minPlayersToStartGame - 1)
         {
