@@ -15,25 +15,13 @@ public class CarController : MonoBehaviourPun
     private Rigidbody _rb;
     private bool _isAlreadyMoving;
 
-
-
     void Start()
     {
         if(planet == null)
         {
-            planet = GameMasterManager.instance.GetPlanet();
+            planet = FindObjectOfType<PlanetManager>();
         }
-        _rb = GetComponent<Rigidbody>();
-
-        if(!photonView.IsMine && GetComponent<Controller>()) 
-        {
-            Destroy(GetComponent<Controller>());
-        }
-        if (photonView.IsMine)
-        {
-            ServerNetwork.instance.photonView.RPC("AddPlayer", ServerNetwork.instance.serverReference, PhotonNetwork.LocalPlayer, this); //Call server to add player
-        }
-        
+        _rb = GetComponent<Rigidbody>(); 
     }
 
     /*private void Update()

@@ -11,6 +11,7 @@ public class ServerNetwork : MonoBehaviourPun
 
     PhotonView _view;
     public Dictionary<Player, CarController> players = new Dictionary<Player, CarController>();
+    public PlanetManager planet;
     public Player serverReference;
 
     private void Awake()
@@ -22,7 +23,7 @@ public class ServerNetwork : MonoBehaviourPun
         {
             if (_view.IsMine)
             {
-                _view.RPC("SetReferenceToSelf", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer); //
+                _view.RPC("SetReferenceToSelf", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
             }
         }
         else
@@ -34,17 +35,24 @@ public class ServerNetwork : MonoBehaviourPun
     [PunRPC]
     public void SetReferenceToSelf(Player p)
     {
-        instance = this;
-        serverReference = p;
+        instance = this; 
+        serverReference = p; 
+        if (!PhotonNetwork.IsMasterClient) 
+            _view.RPC("AddPlayer", serverReference, PhotonNetwork.LocalPlayer);
     }
 
     [PunRPC]
-    public void AddPlayer(Player p, CarController newPlayer)
+    public void AddPlayer(Player p)
     {
-        if (!_view.IsMine)
+        if (!_view.IsMine) 
             return;
-        players.Add(p, newPlayer);
-        foreach(var item in players)
+        var newPlayer = PhotonNetwork.Instantiate("Car",
+                        new Vector3(Random.Range(0, 3),
+                        Random.Range(0, 3),
+                        Random.Range(0, 3)),
+                        Quaternion.identity).GetComponent<CarController>();
+        players.Add(p, newPlayer); //Lo añado al diccionario enlazando el jugador con su Hero
+        foreach (var item in players)
         {
             Debug.Log(item);
         }

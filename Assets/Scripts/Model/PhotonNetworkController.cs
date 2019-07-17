@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
@@ -10,15 +10,20 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
 {
     public static PhotonNetworkController instance { get; private set; } //Singleton
 
-    private bool isHost;
-    private int _playerCount;
+    public bool isHost;
 
     public Text playerCount;
+    public Button playButton;
+
     public byte maxPlayersPerRoom = 8;
     public byte minPlayersToStartGame = 1;
 
-    public bool isServer;
+    private int _playerCount;
 
+    private ServerNetwork _server;
+    private GameObject _serverGameObject;
+    private GameObject _planetGO;
+    //awake method
     private void Awake()
     {
         if(instance == null)
@@ -31,17 +36,21 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
         }
     }
 
+    //if is server, just start it
     void Start()
     {
         DontDestroyOnLoad(this); //Never destroy
         playerCount.enabled = false;
+        if (isHost)
+        {
+            CreateHostServer();
+        }
     }
     /// <summary>
     /// Host Button Pressed
     /// </summary>
-    public void OnHostServerButton()
+    public void CreateHostServer()
     {
-        isHost = true;
         PhotonNetwork.ConnectUsingSettings(); //Try to connect
     }
 
@@ -50,6 +59,7 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     /// </summary>
     public void OnJoinServerButton()
     {
+        playButton.interactable = false;
         PhotonNetwork.ConnectUsingSettings(); //Try to connect
     }
 
@@ -58,6 +68,7 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     /// </summary>
     public override void OnConnectedToMaster()
     {
+        playButton.gameObject.SetActive(false);
         PhotonNetwork.JoinLobby(TypedLobby.Default);
     }
 
@@ -79,20 +90,16 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     /// </summary>
     public override void OnJoinedRoom()
     {
-        /*if (isHost)
+        if (isHost)
         {
-            PhotonNetwork.Instantiate("ServerNetwork", Vector3.zero, Quaternion.identity);
+            var serverGO = PhotonNetwork.Instantiate("ServerNetwork", Vector3.zero, Quaternion.identity);
+            _server = serverGO.GetComponent<ServerNetwork>();
         }
         else
         {
             PhotonNetwork.Instantiate("Controller", Vector3.zero, Quaternion.identity);
-        }*/
-        isServer = isHost;
-        playerCount.enabled = true;
-        if(_playerCount >= minPlayersToStartGame - 1)
-        {
-            SceneManager.LoadScene(1);
         }
+        playerCount.enabled = true;
     }
 
     /// <summary>
@@ -103,6 +110,8 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         PhotonNetwork.Disconnect();
+        playButton.gameObject.SetActive(true);
+        playButton.interactable = true;
     }
 
     /// <summary>
@@ -110,7 +119,9 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     /// </summary>
     public override void OnCreatedRoom()
     {
-        
+        PhotonNetwork.Instantiate("GameMasterManager", Vector3.zero, Quaternion.identity);
+        _planetGO = PhotonNetwork.Instantiate("Planet", Vector3.zero, Quaternion.identity);
+        Debug.Log("Room Created");
     }
 
     private void Update()
@@ -118,6 +129,18 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
         if (PhotonNetwork.CurrentRoom != null)
             _playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
         if(playerCount != null)
-        playerCount.text = "Players: " + _playerCount + "/" + maxPlayersPerRoom;
+            playerCount.text = "Players: " + _playerCount + "/" + maxPlayersPerRoom;
+
+        //Set reference for serverNetwork
+        if(_serverGameObject != null)
+        {
+            _server = _serverGameObject.GetComponent<ServerNetwork>();
+        }
+
+        //Set reference to planet
+        if(_server != null && _server.planet == null && _planetGO != null )
+        {
+            _server.planet = _planetGO.GetComponent<PlanetManager>();
+        }
     }
 }

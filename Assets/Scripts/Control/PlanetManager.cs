@@ -6,7 +6,6 @@ public class PlanetManager : MonoBehaviour
 {
     [Range(0.9990f,1f)]
     public float shrinkSpeed;
-
     public float minSize;
 
     private void Start()
@@ -16,9 +15,12 @@ public class PlanetManager : MonoBehaviour
 
     private void Update()
     {
-        if (transform.localScale.x > minSize)
+        if (GameMasterManager.instance && GameMasterManager.instance.gameActive)
         {
-            transform.localScale *= shrinkSpeed;
+            if (transform.localScale.x > minSize)
+            {
+                transform.localScale *= shrinkSpeed;
+            }
         }
     }
 }
