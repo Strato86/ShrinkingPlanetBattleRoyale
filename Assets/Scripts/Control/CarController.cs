@@ -8,6 +8,7 @@ public class CarController : MonoBehaviourPun
     public PlanetManager planet;
     public float speed;
     public float rotationSpeed;
+    public GameObject myCamera;
 
     private float _horizontal;
     private float _vertical;
@@ -15,13 +16,16 @@ public class CarController : MonoBehaviourPun
     private Rigidbody _rb;
     private bool _isAlreadyMoving;
 
+    
+
     void Start()
     {
         if(planet == null)
         {
-            planet = FindObjectOfType<PlanetManager>();
+            //planet = FindObjectOfType<PlanetManager>();
+            planet = ServerNetwork.instance.planet;
         }
-        _rb = GetComponent<Rigidbody>(); 
+        _rb = GetComponent<Rigidbody>();
     }
 
     /*private void Update()
@@ -45,14 +49,16 @@ public class CarController : MonoBehaviourPun
 
     }*/
 
-    /*TODO: - Controller prefab
-            - Server Move
-            - Animator Move
+    /*TODO: - Animator Move
     */
 
     public void Move(Vector3 axis)
     {
-        if (!_isAlreadyMoving)
+        if (!planet)
+        {
+            planet = ServerNetwork.instance.planet;
+        }
+        else if (!_isAlreadyMoving)
         {
             //Movement
             _isAlreadyMoving = true;
@@ -82,5 +88,10 @@ public class CarController : MonoBehaviourPun
     {
         yield return new WaitForEndOfFrame(); 
         _isAlreadyMoving = false; //Can move again
+    }
+
+    public void RemoveCamera()
+    {
+        Destroy(myCamera);
     }
 }

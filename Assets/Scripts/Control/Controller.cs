@@ -18,7 +18,7 @@ public class Controller : MonoBehaviourPun
     {
         if (!_view.IsMine)
             return;
-
+        
         ServerNetwork.instance.PlayerRequestMove(new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0), PhotonNetwork.LocalPlayer);
     }
 }

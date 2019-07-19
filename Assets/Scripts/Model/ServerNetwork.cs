@@ -11,12 +11,13 @@ public class ServerNetwork : MonoBehaviourPun
 
     PhotonView _view;
     public Dictionary<Player, CarController> players = new Dictionary<Player, CarController>();
+    public Dictionary<Player, PlayerCamera> cameras = new Dictionary<Player, PlayerCamera>();
+
     public PlanetManager planet;
     public Player serverReference;
 
     private void Awake()
     {
-
         _view = GetComponent<PhotonView>();
 
         if (!instance)
@@ -51,7 +52,10 @@ public class ServerNetwork : MonoBehaviourPun
                         Random.Range(0, 3),
                         Random.Range(0, 3)),
                         Quaternion.identity).GetComponent<CarController>();
-        players.Add(p, newPlayer); //Lo añado al diccionario enlazando el jugador con su Hero
+        players.Add(p, newPlayer); //Lo añado al diccionario enlazando el jugador con su CarController
+
+        //TODO: Camera
+
         foreach (var item in players)
         {
             Debug.Log(item);
@@ -67,10 +71,15 @@ public class ServerNetwork : MonoBehaviourPun
             return;
         if (players.ContainsKey(p))
             players[p].Move(dir);
+        if (cameras.ContainsKey(p))
+            cameras[p].Move();
     }
+
+
 
     public void PlayerRequestMove(Vector3 dir, Player p)
     {
         _view.RPC("RequestMove", serverReference,dir, p);
     }
+
 }

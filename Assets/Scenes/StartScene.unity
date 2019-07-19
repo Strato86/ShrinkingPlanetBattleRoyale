@@ -599,7 +599,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c5fb772be3564c88a13661a029421af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isHost: 0
+  isHost: 1
   playerCount: {fileID: 590524260}
   playButton: {fileID: 1124414781}
   maxPlayersPerRoom: 8
