@@ -11,7 +11,6 @@ public class ServerNetwork : MonoBehaviourPun
 
     PhotonView _view;
     public Dictionary<Player, CarController> players = new Dictionary<Player, CarController>();
-    public Dictionary<Player, PlayerCamera> cameras = new Dictionary<Player, PlayerCamera>();
 
     public PlanetManager planet;
     public Player serverReference;
@@ -71,8 +70,6 @@ public class ServerNetwork : MonoBehaviourPun
             return;
         if (players.ContainsKey(p))
             players[p].Move(dir);
-        if (cameras.ContainsKey(p))
-            cameras[p].Move();
     }
 
 
