@@ -35,16 +35,16 @@ public class ServerNetwork : MonoBehaviourPun
     [PunRPC]
     public void SetReferenceToSelf(Player p)
     {
-        instance = this; 
-        serverReference = p; 
-        if (!PhotonNetwork.IsMasterClient) 
+        instance = this;
+        serverReference = p;
+        if (!PhotonNetwork.IsMasterClient)
             _view.RPC("AddPlayer", serverReference, PhotonNetwork.LocalPlayer);
     }
 
     [PunRPC]
     public void AddPlayer(Player p)
     {
-        if (!_view.IsMine) 
+        if (!_view.IsMine)
             return;
         var newPlayer = PhotonNetwork.Instantiate("Car",
                         new Vector3(Random.Range(0, 3),
@@ -54,6 +54,7 @@ public class ServerNetwork : MonoBehaviourPun
         players.Add(p, newPlayer); //Lo añado al diccionario enlazando el jugador con su CarController
 
         //TODO: Camera
+
 
         foreach (var item in players)
         {
@@ -72,11 +73,41 @@ public class ServerNetwork : MonoBehaviourPun
             players[p].Move(dir);
     }
 
+    [PunRPC]
+    void AsignCamera(Player p)
+    {
+        if (!_view.IsMine)
+            return;
+        if (players.ContainsKey(p))
+            players[p].isTaken = true;
+    }
 
+    [PunRPC]
+    void DestroyPlayer(Player p)
+    {
+        if (!_view.IsMine)
+            return;
+        if (players.ContainsKey(p))
+        {
+            var player = players[p];
+            players.Remove(p);
+            PhotonNetwork.Destroy(player.gameObject);
+            Debug.Log("Destroy Player: " + p.UserId);
+        }
+    }
 
     public void PlayerRequestMove(Vector3 dir, Player p)
     {
         _view.RPC("RequestMove", serverReference,dir, p);
     }
 
+    public void PlayerAsignCamera(Player p)
+    {
+        _view.RPC("AsignCamera", serverReference, p);
+    }
+
+    internal void RequestDestroyPlayer(Player p)
+    {
+        _view.RPC("DestroyPlayer", serverReference, p);
+    }
 }

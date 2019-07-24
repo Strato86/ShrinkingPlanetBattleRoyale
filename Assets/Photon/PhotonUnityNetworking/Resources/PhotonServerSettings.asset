@@ -36,5 +36,7 @@ MonoBehaviour:
   - SetReferenceToSeld
   - SetReferenceToSelf
   - RequestMove
+  - AsignCamera
+  - DestroyPlayer
   DisableAutoOpenWizard: 1
   ShowSettings: 0

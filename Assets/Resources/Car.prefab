@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 7861573933089450194}
   - component: {fileID: 7155122363886917642}
   - component: {fileID: 5609665733520243214}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Car
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -112,6 +112,7 @@ MonoBehaviour:
   speed: 30
   rotationSpeed: 150
   myCamera: {fileID: 0}
+  isTaken: 0
 --- !u!54 &7861573933089450194
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -147,6 +148,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   ObservedComponents:
   - {fileID: 5609665733520243214}
+  - {fileID: 7861573933089450281}
   viewIdField: 0
   InstantiationId: 1
   isRuntimeInstantiated: 0

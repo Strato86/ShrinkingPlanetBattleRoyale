@@ -14,6 +14,7 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
 
     public Text playerCount;
     public Button playButton;
+    public Transform cam;
 
     public byte maxPlayersPerRoom = 8;
     public byte minPlayersToStartGame = 1;
@@ -21,7 +22,6 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     private int _playerCount;
 
     private ServerNetwork _server;
-    private GameObject _serverGameObject;
     private GameObject _planetGO;
     //awake method
     private void Awake()
@@ -92,6 +92,7 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     {
         if (isHost)
         {
+            Destroy(FindObjectOfType<PlayerCamera>());
             var serverGO = PhotonNetwork.Instantiate("ServerNetwork", Vector3.zero, Quaternion.identity);
             _server = serverGO.GetComponent<ServerNetwork>();
         }
@@ -129,13 +130,7 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
         if (PhotonNetwork.CurrentRoom != null)
             _playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
         if(playerCount != null)
-            playerCount.text = "Players: " + _playerCount + "/" + maxPlayersPerRoom;
-
-        //Set reference for serverNetwork
-        if(_serverGameObject != null)
-        {
-            _server = _serverGameObject.GetComponent<ServerNetwork>();
-        }
+            playerCount.text = "Players: " + (_playerCount - 1) + "/" + maxPlayersPerRoom;
 
         //Set reference to planet
         if(_server != null && _server.planet == null && _planetGO != null )

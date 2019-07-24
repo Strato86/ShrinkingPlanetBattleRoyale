@@ -11,9 +11,9 @@ public class Controller : MonoBehaviourPun
     void Start()
     {
         _view = GetComponent<PhotonView>();
+            //TODO: Asign camera
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (!_view.IsMine)
@@ -21,4 +21,6 @@ public class Controller : MonoBehaviourPun
         
         ServerNetwork.instance.PlayerRequestMove(new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0), PhotonNetwork.LocalPlayer);
     }
+
+
 }
