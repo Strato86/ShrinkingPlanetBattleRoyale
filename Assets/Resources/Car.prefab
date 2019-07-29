@@ -94,8 +94,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 0.9405556, z: 0.93563795}
+  m_Center: {x: 0, y: 0.029722214, z: -0.032181025}
 --- !u!114 &7861573933089450281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -113,6 +113,7 @@ MonoBehaviour:
   rotationSpeed: 150
   myCamera: {fileID: 0}
   isTaken: 0
+  GFX: {fileID: 7522662997964894224}
 --- !u!54 &7861573933089450194
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -256,6 +257,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a9dfd27c0efc4ad4a941b8682845d98f, type: 3}
+--- !u!1 &7522662997964894224 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6261692075972196658, guid: a9dfd27c0efc4ad4a941b8682845d98f,
+    type: 3}
+  m_PrefabInstance: {fileID: 4503636906203892002}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1846834175853016927 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2819644802626911869, guid: a9dfd27c0efc4ad4a941b8682845d98f,

@@ -120,7 +120,8 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     /// </summary>
     public override void OnCreatedRoom()
     {
-        PhotonNetwork.Instantiate("GameMasterManager", Vector3.zero, Quaternion.identity);
+        var gameMasterManagerGO = PhotonNetwork.Instantiate("GameMasterManager", Vector3.zero, Quaternion.identity);
+        //gameMasterManagerGO.GetComponent<GameMasterManager>().StartGame();
         _planetGO = PhotonNetwork.Instantiate("Planet", Vector3.zero, Quaternion.identity);
         Debug.Log("Room Created");
     }

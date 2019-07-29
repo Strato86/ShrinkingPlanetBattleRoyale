@@ -14,6 +14,7 @@ public class CarController : MonoBehaviourPun, IPunObservable
     public float rotationSpeed;
     public GameObject myCamera;
     public bool isTaken;
+    public GameObject GFX;
 
     private float _horizontal;
     private float _vertical;
@@ -70,32 +71,35 @@ public class CarController : MonoBehaviourPun, IPunObservable
     {
         if(_server != null)
         {
-            if (!planet)
+            if (GFX.activeSelf)
             {
-                planet = _server.planet;
-            }
-            else if (!_isAlreadyMoving)
-            {
-                //Movement
-                _isAlreadyMoving = true;
-                _horizontal = axis.x;
-                _vertical = axis.y;
+                if (!planet)
+                {
+                    planet = _server.planet;
+                }
+                else if (!_isAlreadyMoving)
+                {
+                    //Movement
+                    _isAlreadyMoving = true;
+                    _horizontal = axis.x;
+                    _vertical = axis.y;
 
-                transform.Translate(0, 0, _vertical);
+                    transform.Translate(0, 0, _vertical);
 
-                //LocalRotation
-                transform.Rotate(0, rotationSpeed * Time.deltaTime * _horizontal, 0);
+                    //LocalRotation
+                    transform.Rotate(0, rotationSpeed * Time.deltaTime * _horizontal, 0);
 
-                //Ground Control
-                var normal = (transform.position - planet.transform.position).normalized;
-                transform.position = normal * planet.transform.localScale.x / 2;
+                    //Ground Control
+                    var normal = (transform.position - planet.transform.position).normalized;
+                    transform.position = normal * planet.transform.localScale.x / 2;
 
-                //Stick to planet
-                var toRotation = Quaternion.FromToRotation(transform.up, normal) * transform.rotation;
-                transform.rotation = toRotation;
+                    //Stick to planet
+                    var toRotation = Quaternion.FromToRotation(transform.up, normal) * transform.rotation;
+                    transform.rotation = toRotation;
 
-                //Start Coroutine to wait for next frame
-                StartCoroutine(WaitToMoveAgain());
+                    //Start Coroutine to wait for next frame
+                    StartCoroutine(WaitToMoveAgain());
+                }
             }
         }
     }
@@ -115,13 +119,20 @@ public class CarController : MonoBehaviourPun, IPunObservable
     private void OnTriggerEnter(Collider other)
     {
         if (!_server)
+        {
+            Debug.Log("No server Bro!");
             return;
+        }
         if (!photonView.IsMine)
+        {
+            Debug.Log("Cant controll this Bro!");
             return;
+        }
 
         if(other.gameObject.layer == 10)
         {
-            _server.RequestDestroyPlayer(PhotonNetwork.LocalPlayer);
+            Debug.Log("Destroying this bitch!!");
+            RequestActivateObject(false);
         }
     }
 
@@ -137,5 +148,19 @@ public class CarController : MonoBehaviourPun, IPunObservable
         {
             isTaken = (bool)stream.ReceiveNext();
         }
+    }
+
+    public void RequestActivateObject(bool active)
+    {
+        gameObject.SetActive(active);
+        StopAllCoroutines();
+        photonView.RPC("DeactivateGFXObject", RpcTarget.OthersBuffered, active);
+    }
+
+    [PunRPC]
+    void DeactivateGFXObject(bool active)
+    {
+        GFX.SetActive(active);
+        enabled = false;
     }
 }

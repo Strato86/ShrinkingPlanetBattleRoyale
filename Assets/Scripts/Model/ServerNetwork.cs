@@ -54,7 +54,10 @@ public class ServerNetwork : MonoBehaviourPun
         players.Add(p, newPlayer); //Lo añado al diccionario enlazando el jugador con su CarController
 
         //TODO: Camera
-
+        if (players.Count > 1)
+        {
+            GameMasterManager.instance.StartGame();
+        }
 
         foreach (var item in players)
         {
@@ -85,14 +88,26 @@ public class ServerNetwork : MonoBehaviourPun
     [PunRPC]
     void DestroyPlayer(Player p)
     {
+        Debug.Log("Entro a destruir Player");
         if (!_view.IsMine)
+        {
+            Debug.Log("I dont control this bro!");
             return;
+        }
         if (players.ContainsKey(p))
         {
             var player = players[p];
             players.Remove(p);
             PhotonNetwork.Destroy(player.gameObject);
             Debug.Log("Destroy Player: " + p.UserId);
+        }
+        else
+        {
+            Debug.Log(p + "ya no esta en el dic");
+            foreach (var pl in players)
+            {
+                Debug.Log(pl);
+            }
         }
     }
 
@@ -106,8 +121,29 @@ public class ServerNetwork : MonoBehaviourPun
         _view.RPC("AsignCamera", serverReference, p);
     }
 
-    internal void RequestDestroyPlayer(Player p)
+    public void RequestDestroyPlayer(Player p)
     {
+        Debug.Log("Request Destroy Player");
         _view.RPC("DestroyPlayer", serverReference, p);
+    }
+
+    public void CraterRequestInstantiate(Vector3 pos)
+    {
+        if (!_view.IsMine)
+            return;
+
+        var dir = (pos - Vector3.zero).normalized;
+        var craterGO = PhotonNetwork.Instantiate("Crater", pos, Quaternion.LookRotation(dir));
+        craterGO.transform.SetParent(planet.transform);
+    }
+
+    public void RequestInstantiateComet(Vector3 pos)
+    {
+        if (!photonView.IsMine)
+            return;
+
+        var dir = (Vector3.zero - pos).normalized;
+        PhotonNetwork.Instantiate("Comet", pos, Quaternion.LookRotation(dir));
+
     }
 }
