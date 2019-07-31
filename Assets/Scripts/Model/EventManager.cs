@@ -55,5 +55,7 @@ public enum GameEvent
 {
     NULL,
     CAR_SPAWN,
-    CAR_DESTROY
+    CAR_DESTROY,
+    START_GAME,
+    END_GAME
 }

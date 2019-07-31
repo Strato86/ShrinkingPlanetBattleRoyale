@@ -5,7 +5,7 @@ using System;
 
 public class PlayerCamera : MonoBehaviour
 {
-    private const int CAMERA_DISTANCE = 10;
+    private const int CAMERA_DISTANCE = 15;
     private bool _isAsigned;
     private Camera cam;
 
@@ -25,7 +25,7 @@ public class PlayerCamera : MonoBehaviour
             var carControllers = FindObjectsOfType<CarController>();
             foreach (var car in carControllers)
             {
-                if (!car.isTaken)
+                if (!car.isTaken && car.playerID == PhotonNetwork.LocalPlayer.UserId)
                 {
                     ServerNetwork.instance.PlayerAsignCamera(PhotonNetwork.LocalPlayer);
                     cam.enabled = true;

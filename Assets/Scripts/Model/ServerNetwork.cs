@@ -3,27 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.UI;
+using System.Linq;
 
 [RequireComponent(typeof(PhotonView))]
 public class ServerNetwork : MonoBehaviourPun
 {
     public static ServerNetwork instance { get; private set; }
 
-    PhotonView _view;
+    
     public Dictionary<Player, CarController> players = new Dictionary<Player, CarController>();
+    public Dictionary<Player, UIController> uis = new Dictionary<Player, UIController>();
 
     public PlanetManager planet;
     public Player serverReference;
 
+    public int secondsToStart = 3;
+
+    private List<CarController> _losers;
+
     private void Awake()
     {
-        _view = GetComponent<PhotonView>();
+        _losers = new List<CarController>();
 
         if (!instance)
         {
-            if (_view.IsMine)
+            if (photonView.IsMine)
             {
-                _view.RPC("SetReferenceToSelf", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
+                photonView.RPC("SetReferenceToSelf", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer);
             }
         }
         else
@@ -38,31 +45,33 @@ public class ServerNetwork : MonoBehaviourPun
         instance = this;
         serverReference = p;
         if (!PhotonNetwork.IsMasterClient)
-            _view.RPC("AddPlayer", serverReference, PhotonNetwork.LocalPlayer);
+            photonView.RPC("AddPlayer", serverReference, PhotonNetwork.LocalPlayer);
     }
 
     [PunRPC]
     public void AddPlayer(Player p)
     {
-        if (!_view.IsMine)
+        if (!photonView.IsMine)
             return;
+
+        var position = new Vector3();
+        var rotation = new Quaternion();
+
+        foreach (var sp in planet.carSpawnPoints)
+        {
+            if (!sp.isTaken)
+            {
+                position = sp.transform.position;
+                rotation = sp.transform.rotation;
+                sp.isTaken = true;
+                break;
+            }
+        }
         var newPlayer = PhotonNetwork.Instantiate("Car",
-                        new Vector3(Random.Range(0, 3),
-                        Random.Range(0, 3),
-                        Random.Range(0, 3)),
-                        Quaternion.identity).GetComponent<CarController>();
+                        position,
+                        rotation).GetComponent<CarController>();
+
         players.Add(p, newPlayer); //Lo añado al diccionario enlazando el jugador con su CarController
-
-        //TODO: Camera
-        if (players.Count > 1)
-        {
-            GameMasterManager.instance.StartGame();
-        }
-
-        foreach (var item in players)
-        {
-            Debug.Log(item);
-        }
     }
 
     //De ahora en mas son comandos para mover a los players
@@ -70,7 +79,9 @@ public class ServerNetwork : MonoBehaviourPun
     [PunRPC]
     void RequestMove(Vector3 dir, Player p)
     {
-        if (!_view.IsMine)
+        if (!photonView.IsMine)
+            return;
+        if (!GameMasterManager.instance.gameActive)
             return;
         if (players.ContainsKey(p))
             players[p].Move(dir);
@@ -79,57 +90,76 @@ public class ServerNetwork : MonoBehaviourPun
     [PunRPC]
     void AsignCamera(Player p)
     {
-        if (!_view.IsMine)
+        if (!photonView.IsMine)
             return;
         if (players.ContainsKey(p))
             players[p].isTaken = true;
     }
 
     [PunRPC]
-    void DestroyPlayer(Player p)
+    void AsignPlayerID(string id, Player p)
     {
-        Debug.Log("Entro a destruir Player");
-        if (!_view.IsMine)
+        Debug.Log("Asigno ID: " + id);
+        if (!photonView.IsMine)
         {
-            Debug.Log("I dont control this bro!");
+            Debug.Log("No puedo asignar id porque no es mio");
             return;
         }
         if (players.ContainsKey(p))
         {
-            var player = players[p];
-            players.Remove(p);
-            PhotonNetwork.Destroy(player.gameObject);
-            Debug.Log("Destroy Player: " + p.UserId);
+            players[p].playerID = id;
         }
         else
         {
-            Debug.Log(p + "ya no esta en el dic");
-            foreach (var pl in players)
-            {
-                Debug.Log(pl);
-            }
+            Debug.Log("No esta en el diccionario ???");
         }
     }
 
+    public bool StartGameFromServer()
+    {
+        if (players.Count >= PhotonNetworkController.instance.minPlayersToStartGame)
+        {
+            StartCoroutine(CountDown());
+            EventManager.DispatchEvent(GameEvent.START_GAME);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    IEnumerator CountDown()
+    {
+        for (int i = secondsToStart; i > 0; i--)
+        {
+            yield return new WaitForSeconds(1f);
+        }
+        GameMasterManager.instance.StartGame();
+    }
+
+    //Para el movimiento del player
     public void PlayerRequestMove(Vector3 dir, Player p)
     {
-        _view.RPC("RequestMove", serverReference,dir, p);
+        photonView.RPC("RequestMove", serverReference,dir, p);
     }
 
+    //Asigno la camara al player, para poner en true la variable isTaken del carController
     public void PlayerAsignCamera(Player p)
     {
-        _view.RPC("AsignCamera", serverReference, p);
+        photonView.RPC("AsignCamera", serverReference, p);
     }
 
-    public void RequestDestroyPlayer(Player p)
+    //Asigno el ID del player al car controller, para poder asignar la camara bien
+    public void PlayerAsignID(string id, Player p)
     {
-        Debug.Log("Request Destroy Player");
-        _view.RPC("DestroyPlayer", serverReference, p);
+        photonView.RPC("AsignPlayerID", serverReference, id, p);
     }
 
+    //Crea un crater, setea el parent al planeta y lo sincroniza a los otros users
     public void CraterRequestInstantiate(Vector3 pos)
     {
-        if (!_view.IsMine)
+        if (!photonView.IsMine)
             return;
 
         var dir = (pos - Vector3.zero).normalized;
@@ -137,6 +167,7 @@ public class ServerNetwork : MonoBehaviourPun
         craterGO.transform.SetParent(planet.transform);
     }
 
+    //Instancia un cometa desde el server en una posicion dada y mirando hacia el planeta
     public void RequestInstantiateComet(Vector3 pos)
     {
         if (!photonView.IsMine)
@@ -145,5 +176,38 @@ public class ServerNetwork : MonoBehaviourPun
         var dir = (Vector3.zero - pos).normalized;
         PhotonNetwork.Instantiate("Comet", pos, Quaternion.LookRotation(dir));
 
+    }
+
+    //Destroye le cometa desde el server
+    public void RequestDestroyComet(GameObject go)
+    {
+        if (!photonView.IsMine)
+            return;
+        PhotonNetwork.Destroy(go);
+    }
+
+    public void SetLoser(CarController c)
+    {
+        if (!photonView.IsMine)
+            return;
+        if (!_losers.Contains(c))
+        {
+            _losers.Add(c);
+        }
+
+        if(_losers.Count + 1 >= players.Count)
+        {
+            Player winner = null;
+            foreach (var p in players)
+            {
+                if (p.Value.GFX.activeSelf)
+                    winner = p.Key;
+            }
+            if (winner != null)
+                EventManager.DispatchEvent(GameEvent.END_GAME, winner.NickName);
+            else 
+                EventManager.DispatchEvent(GameEvent.END_GAME, "Nobody");
+            GameMasterManager.instance.EndGame();
+        }
     }
 }

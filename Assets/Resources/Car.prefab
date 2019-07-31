@@ -114,6 +114,7 @@ MonoBehaviour:
   myCamera: {fileID: 0}
   isTaken: 0
   GFX: {fileID: 7522662997964894224}
+  playerID: 
 --- !u!54 &7861573933089450194
 Rigidbody:
   m_ObjectHideFlags: 0

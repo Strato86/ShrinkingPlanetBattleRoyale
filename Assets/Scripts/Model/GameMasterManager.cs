@@ -12,38 +12,33 @@ public class GameMasterManager : MonoBehaviourPun
     public PlanetManager planet;
 
     private float _tick;
-    private float _cometSpawnTimer = 10f;
+    private float _cometSpawnTimer = 2f;
 
     private void Awake()
     {
-        if(_instance == null)
+        if (_instance == null)
         {
             _instance = this;
         }
-        if(planet == null)
-        {
-            planet = (PlanetManager)FindObjectOfType(typeof(PlanetManager));
-        }
-    }
 
+    }
     private void Update()
     {
         if (!photonView.IsMine)
             return;
+        if (planet == null)
+        {
+            planet = (PlanetManager)FindObjectOfType(typeof(PlanetManager));
+        }
         if (gameActive)
         {
             _tick += Time.deltaTime;
             if(_tick >= _cometSpawnTimer)
             {
                 _tick = 0;
-                var posX = Random.Range(-1, 1);
-                var posY = Random.Range(-1, 1);
-                var posZ = Random.Range(-1, 1);
+                var randomPos = Random.onUnitSphere.normalized * planet.transform.localScale.x;
 
-                
-
-                var pos = new Vector3(posX,posY,posZ) * Random.Range(50,55);
-                ServerNetwork.instance.RequestInstantiateComet(pos);
+                ServerNetwork.instance.RequestInstantiateComet(randomPos);
             }
         }
     }

@@ -17,19 +17,21 @@ public class CometBehaviour : MonoBehaviourPun
 
     private void OnTriggerEnter(Collider other)
     {
-        RequestDestroyComet();
+        RequestDestroyComet(other);
     }
 
-    public void RequestDestroyComet()
+    public void RequestDestroyComet(Collider other)
     {
+        if (!photonView.IsMine)
+            return;
         gameObject.SetActive(false);
-        photonView.RPC("DestroyComet", RpcTarget.OthersBuffered);
-        ServerNetwork.instance.CraterRequestInstantiate(transform.position);
+        if(other.gameObject.layer != 10)
+        {
+            var position = transform.position.normalized * ServerNetwork.instance.planet.transform.localScale.x/2;
+            ServerNetwork.instance.RequestDestroyComet(gameObject);
+            ServerNetwork.instance.CraterRequestInstantiate(position);
+        }
     }
 
-    [PunRPC]
-    void DestroyComet()
-    {
-        gameObject.SetActive(false);
-    }
+
 }

@@ -7,19 +7,27 @@ using Photon.Pun;
 public class Controller : MonoBehaviourPun
 {
     private PhotonView _view;
+    private int curveMultiplier = 1;
     // Start is called before the first frame update
     void Start()
     {
         _view = GetComponent<PhotonView>();
-            //TODO: Asign camera
+        ServerNetwork.instance.PlayerAsignID(PhotonNetwork.LocalPlayer.UserId, PhotonNetwork.LocalPlayer);
     }
 
     void Update()
     {
         if (!_view.IsMine)
             return;
-        
-        ServerNetwork.instance.PlayerRequestMove(new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0), PhotonNetwork.LocalPlayer);
+        if (Input.GetKey(KeyCode.Space))
+        {
+            curveMultiplier = 2;
+        }
+        else
+        {
+            curveMultiplier = 1;
+        }
+        ServerNetwork.instance.PlayerRequestMove(new Vector3(Input.GetAxis("Horizontal")* curveMultiplier, 1 + Input.GetAxis("Vertical"), 0), PhotonNetwork.LocalPlayer);
     }
 
 

@@ -42,5 +42,9 @@ MonoBehaviour:
   - DeactivateGFXObject
   - DestroyComet
   - CreateCrater
+  - AsignPlayerID
+  - AsignCraterParent
+  - DisableMenuBG
+  - StartCountDown
   DisableAutoOpenWizard: 1
   ShowSettings: 0

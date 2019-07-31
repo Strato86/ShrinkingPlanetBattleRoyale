@@ -14,7 +14,11 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
 
     public Text playerCount;
     public Button playButton;
-    public Transform cam;
+    public Button startGame;
+
+    public Image menuBG;
+    public Image serverBG;
+    public Image waiting;
 
     public byte maxPlayersPerRoom = 8;
     public byte minPlayersToStartGame = 1;
@@ -23,7 +27,7 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
 
     private ServerNetwork _server;
     private GameObject _planetGO;
-    //awake method
+
     private void Awake()
     {
         if(instance == null)
@@ -34,6 +38,9 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
         {
             Destroy(gameObject);
         }
+        //Solo lo muestro luego si soy server
+        startGame.gameObject.SetActive(false);
+        waiting.gameObject.SetActive(false);
     }
 
     //if is server, just start it
@@ -41,11 +48,15 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     {
         DontDestroyOnLoad(this); //Never destroy
         playerCount.enabled = false;
+        serverBG.gameObject.SetActive(false);
         if (isHost)
         {
+            menuBG.gameObject.SetActive(false);
+            serverBG.gameObject.SetActive(true);
             CreateHostServer();
         }
     }
+
     /// <summary>
     /// Host Button Pressed
     /// </summary>
@@ -64,11 +75,24 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     }
 
     /// <summary>
+    /// Start Game (Only server build can see this button)
+    /// </summary>
+    public void OnStartGameButton()
+    {
+        if (ServerNetwork.instance)
+        {
+            var result = ServerNetwork.instance.StartGameFromServer();
+            startGame.interactable = !result;
+        }
+    }
+
+    /// <summary>
     /// On connected to master callback
     /// </summary>
     public override void OnConnectedToMaster()
     {
         playButton.gameObject.SetActive(false);
+        waiting.gameObject.SetActive(true);
         PhotonNetwork.JoinLobby(TypedLobby.Default);
     }
 
@@ -79,7 +103,7 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     {
         if (isHost)
         {
-            PhotonNetwork.CreateRoom("MainRoom", new RoomOptions() { MaxPlayers = maxPlayersPerRoom });
+            PhotonNetwork.CreateRoom("MainRoom", new RoomOptions() { MaxPlayers = maxPlayersPerRoom});
             return;
         }
         PhotonNetwork.JoinRandomRoom();
@@ -93,8 +117,10 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
         if (isHost)
         {
             Destroy(FindObjectOfType<PlayerCamera>());
+            startGame.gameObject.SetActive(true);
             var serverGO = PhotonNetwork.Instantiate("ServerNetwork", Vector3.zero, Quaternion.identity);
             _server = serverGO.GetComponent<ServerNetwork>();
+            PhotonNetwork.Instantiate("UIController", Vector3.zero, Quaternion.identity);
         }
         else
         {
@@ -126,12 +152,18 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
         Debug.Log("Room Created");
     }
 
+    public void OnNickNameChangeValue(string value)
+    {
+        PhotonNetwork.NickName = value;
+        Debug.Log(value);
+    }
+
     private void Update()
     {
         if (PhotonNetwork.CurrentRoom != null)
             _playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
         if(playerCount != null)
-            playerCount.text = "Players: " + (_playerCount - 1) + "/" + maxPlayersPerRoom;
+            playerCount.text = "Players: " + (_playerCount - 1) + "/" + (maxPlayersPerRoom -1);
 
         //Set reference to planet
         if(_server != null && _server.planet == null && _planetGO != null )

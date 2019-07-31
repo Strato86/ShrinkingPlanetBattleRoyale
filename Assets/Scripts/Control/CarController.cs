@@ -15,7 +15,7 @@ public class CarController : MonoBehaviourPun, IPunObservable
     public GameObject myCamera;
     public bool isTaken;
     public GameObject GFX;
-
+    public string playerID;
     private float _horizontal;
     private float _vertical;
 
@@ -29,7 +29,6 @@ public class CarController : MonoBehaviourPun, IPunObservable
     {
         if(planet == null)
         {
-            //planet = FindObjectOfType<PlanetManager>();
             planet = ServerNetwork.instance.planet;
         }
         _rb = GetComponent<Rigidbody>();
@@ -37,10 +36,15 @@ public class CarController : MonoBehaviourPun, IPunObservable
         _server = ServerNetwork.instance;
     }
 
+    //Uso una corrutina cada 0.5 segundos para limitar el numero de llamados al servidor
     IEnumerator AsignCameraDelay()
     {
-        yield return new WaitForSeconds(2);
-        EventManager.DispatchEvent(GameEvent.CAR_SPAWN, photonView);
+        while (!isTaken)
+        {
+            yield return new WaitForSeconds(0.5f);
+            EventManager.DispatchEvent(GameEvent.CAR_SPAWN, photonView);
+            Debug.Log("Asigno camara");
+        }
     }
 
     /*private void Update()
@@ -143,10 +147,12 @@ public class CarController : MonoBehaviourPun, IPunObservable
         if (stream.IsWriting)
         {
             stream.SendNext(isTaken);
+            stream.SendNext(playerID);
         }
         else
         {
             isTaken = (bool)stream.ReceiveNext();
+            playerID = (string)stream.ReceiveNext();
         }
     }
 
@@ -154,6 +160,10 @@ public class CarController : MonoBehaviourPun, IPunObservable
     {
         gameObject.SetActive(active);
         StopAllCoroutines();
+        _server.SetLoser(this);
+        var text = FindObjectOfType<UiControllerObserver>().countDownText;
+        text.text = "You Lost!";
+        text.enabled = true;
         photonView.RPC("DeactivateGFXObject", RpcTarget.OthersBuffered, active);
     }
 
