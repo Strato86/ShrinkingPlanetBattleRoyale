@@ -46,5 +46,6 @@ MonoBehaviour:
   - AsignCraterParent
   - DisableMenuBG
   - StartCountDown
+  - SetMoving
   DisableAutoOpenWizard: 1
   ShowSettings: 0

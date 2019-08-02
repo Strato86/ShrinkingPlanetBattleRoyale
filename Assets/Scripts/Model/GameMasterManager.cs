@@ -36,7 +36,7 @@ public class GameMasterManager : MonoBehaviourPun
             if(_tick >= _cometSpawnTimer)
             {
                 _tick = 0;
-                var randomPos = Random.onUnitSphere.normalized * planet.transform.localScale.x;
+                var randomPos = Random.onUnitSphere.normalized * planet.transform.localScale.x * 1.5f;
 
                 ServerNetwork.instance.RequestInstantiateComet(randomPos);
             }

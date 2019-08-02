@@ -47,6 +47,7 @@ MonoBehaviour:
   isBGActive: 0
   isCoundownActive: 0
   countdownValue: 
+  lastCarDestroyed: 
 --- !u!114 &2421658067772640513
 MonoBehaviour:
   m_ObjectHideFlags: 0

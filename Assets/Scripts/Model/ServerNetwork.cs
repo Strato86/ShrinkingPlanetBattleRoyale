@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(PhotonView))]
 public class ServerNetwork : MonoBehaviourPun
@@ -88,6 +89,19 @@ public class ServerNetwork : MonoBehaviourPun
     }
 
     [PunRPC]
+    void SetMoving(float horizontal, Player p)
+    {
+        if (!photonView.IsMine)
+            return;
+        if (!GameMasterManager.instance.gameActive)
+            return;
+        if (players.ContainsKey(p))
+        {
+            players[p].SetAnimation(horizontal);
+        }
+    }
+
+    [PunRPC]
     void AsignCamera(Player p)
     {
         if (!photonView.IsMine)
@@ -142,6 +156,7 @@ public class ServerNetwork : MonoBehaviourPun
     public void PlayerRequestMove(Vector3 dir, Player p)
     {
         photonView.RPC("RequestMove", serverReference,dir, p);
+        photonView.RPC("SetMoving", RpcTarget.All, dir.x, p); //RPC para sincronizar en todos mi animación de movimiento.
     }
 
     //Asigno la camara al player, para poner en true la variable isTaken del carController
@@ -186,6 +201,14 @@ public class ServerNetwork : MonoBehaviourPun
         PhotonNetwork.Destroy(go);
     }
 
+    public void ParticleRequestInstantiate(string particleName, Transform pos)
+    {
+        if (!photonView.IsMine)
+            return;
+
+        PhotonNetwork.Instantiate(particleName, pos.position, pos.rotation);
+    }
+
     public void SetLoser(CarController c)
     {
         if (!photonView.IsMine)
@@ -200,7 +223,7 @@ public class ServerNetwork : MonoBehaviourPun
             Player winner = null;
             foreach (var p in players)
             {
-                if (p.Value.GFX.activeSelf)
+                if (!_losers.Contains(p.Value))
                     winner = p.Key;
             }
             if (winner != null)
@@ -208,6 +231,16 @@ public class ServerNetwork : MonoBehaviourPun
             else 
                 EventManager.DispatchEvent(GameEvent.END_GAME, "Nobody");
             GameMasterManager.instance.EndGame();
+            StartCoroutine(EndGame());
+            _losers.Clear();
+            players.Clear();
+        }
+
+        IEnumerator EndGame()
+        {
+            yield return new WaitForSeconds(10);
+            PhotonNetwork.Disconnect();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 }

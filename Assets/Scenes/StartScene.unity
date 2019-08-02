@@ -144,10 +144,10 @@ RectTransform:
   m_Father: {fileID: 349345436}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 700, y: 120}
+  m_SizeDelta: {x: 0, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2193316
 MonoBehaviour:
@@ -356,6 +356,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 2193315}
+  - {fileID: 1632681859}
   - {fileID: 551087451}
   - {fileID: 369286692}
   m_Father: {fileID: 0}
@@ -383,7 +384,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &369286692
 RectTransform:
   m_ObjectHideFlags: 0
@@ -399,7 +400,7 @@ RectTransform:
   - {fileID: 1689186364}
   - {fileID: 643879615}
   m_Father: {fileID: 349345436}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -681,7 +682,7 @@ RectTransform:
   - {fileID: 463640414}
   - {fileID: 1639532844}
   m_Father: {fileID: 349345436}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -949,25 +950,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Player 1 connected
-
-    Player 2 connected
-
-    Player 3
-
-    Player 4
-
-    Player 5
-
-    Player 6
-
-    Player 7
-
-    Player 8
-
-    Starting Game
-
-    Game End
+  m_Text: 'This should be a LOG (work in progress)
 
 '
 --- !u!222 &669691851
@@ -1276,6 +1259,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuBG: {fileID: 551087452}
   countDownText: {fileID: 2193316}
+  youLose: {fileID: 1632681857}
 --- !u!4 &1285515046
 Transform:
   m_ObjectHideFlags: 0
@@ -1319,15 +1303,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c5fb772be3564c88a13661a029421af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isHost: 1
+  isHost: 0
   playerCount: {fileID: 590524260}
   playButton: {fileID: 1206373154}
   startGame: {fileID: 412899333}
   menuBG: {fileID: 551087452}
   serverBG: {fileID: 369286693}
   waiting: {fileID: 336534208}
-  maxPlayersPerRoom: 8
-  minPlayersToStartGame: 1
+  maxPlayersPerRoom: 9
+  minPlayersToStartGame: 2
 --- !u!4 &1453819924
 Transform:
   m_ObjectHideFlags: 0
@@ -1579,6 +1563,85 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1540899810}
   m_CullTransparentMesh: 0
+--- !u!1 &1632681856
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1632681859}
+  - component: {fileID: 1632681858}
+  - component: {fileID: 1632681857}
+  m_Layer: 5
+  m_Name: YouLost
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1632681857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632681856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 0.85882354, b: 0.06666667, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 696880a97f54e0e42a8e3db966244e36, type: 3}
+    m_FontSize: 150
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 150
+    m_Alignment: 1
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: YOU LOST!!!!
+--- !u!222 &1632681858
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632681856}
+  m_CullTransparentMesh: 0
+--- !u!224 &1632681859
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1632681856}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 349345436}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 202}
+  m_SizeDelta: {x: 0, y: 200}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1639532843
 GameObject:
   m_ObjectHideFlags: 0

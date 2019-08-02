@@ -46,15 +46,17 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
     //if is server, just start it
     void Start()
     {
-        DontDestroyOnLoad(this); //Never destroy
+        //DontDestroyOnLoad(this); //Never destroy
         playerCount.enabled = false;
         serverBG.gameObject.SetActive(false);
+        PhotonNetwork.NickName = "NickName";
         if (isHost)
         {
             menuBG.gameObject.SetActive(false);
             serverBG.gameObject.SetActive(true);
             CreateHostServer();
         }
+
     }
 
     /// <summary>
@@ -150,6 +152,21 @@ public class PhotonNetworkController : MonoBehaviourPunCallbacks
         //gameMasterManagerGO.GetComponent<GameMasterManager>().StartGame();
         _planetGO = PhotonNetwork.Instantiate("Planet", Vector3.zero, Quaternion.identity);
         Debug.Log("Room Created");
+    }
+
+    /// <summary>
+    /// On Disconnect Reload the Scene to reset everything
+    /// </summary>
+    /// <param name="cause"></param>
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Debug.Log(cause);
+    }
+
+    public void DisconectUser()
+    {
+        PhotonNetwork.Disconnect();
     }
 
     public void OnNickNameChangeValue(string value)

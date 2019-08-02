@@ -11,6 +11,7 @@ public class UIController : MonoBehaviourPun , IPunObservable
     public bool isBGActive;
     public bool isCoundownActive;
     public string countdownValue;
+    public string lastCarDestroyed;
 
     private int secondsToStart = 3;
 
@@ -19,11 +20,18 @@ public class UIController : MonoBehaviourPun , IPunObservable
         isBGActive = true;
         isCoundownActive = false;
         EventManager.AddEventListener(GameEvent.START_GAME, onStartGame);
+        EventManager.AddEventListener(GameEvent.CAR_DESTROY, onCarDestroy);
         EventManager.AddEventListener(GameEvent.END_GAME, onEndGame);
+    }
+
+    private void onCarDestroy(object[] p)
+    {
+        lastCarDestroyed = (string)p[0];
     }
 
     private void onEndGame(object[] p)
     {
+        EventManager.RemoveEventListener(GameEvent.END_GAME, onEndGame);
         isCoundownActive = true;
         countdownValue = (string)p[0] + " is the winner";
     }
@@ -72,12 +80,14 @@ public class UIController : MonoBehaviourPun , IPunObservable
             stream.SendNext(isBGActive);
             stream.SendNext(isCoundownActive);
             stream.SendNext(countdownValue);
+            stream.SendNext(lastCarDestroyed);
         }
         else
         {
             isBGActive = (bool)stream.ReceiveNext();
             isCoundownActive = (bool)stream.ReceiveNext();
             countdownValue = (string)stream.ReceiveNext();
+            lastCarDestroyed = (string)stream.ReceiveNext();
         }
     }
 }

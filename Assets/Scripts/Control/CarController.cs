@@ -15,6 +15,7 @@ public class CarController : MonoBehaviourPun, IPunObservable
     public GameObject myCamera;
     public bool isTaken;
     public GameObject GFX;
+    public Animator _anim;
     public string playerID;
     private float _horizontal;
     private float _vertical;
@@ -108,6 +109,19 @@ public class CarController : MonoBehaviourPun, IPunObservable
         }
     }
 
+    //Seteo la animacion
+    public void SetAnimation(float horizontal)
+    {
+        if(_server != null)
+        {
+            if (GFX.activeSelf)
+            {
+                if (_anim)
+                    _anim.SetFloat("curve", horizontal);
+            }
+        }
+    }
+
     //Coroutine to move once per frame
     IEnumerator WaitToMoveAgain()
     {
@@ -161,10 +175,12 @@ public class CarController : MonoBehaviourPun, IPunObservable
         gameObject.SetActive(active);
         StopAllCoroutines();
         _server.SetLoser(this);
+        _server.ParticleRequestInstantiate("CarExplotion", transform);
         var text = FindObjectOfType<UiControllerObserver>().countDownText;
         text.text = "You Lost!";
         text.enabled = true;
         photonView.RPC("DeactivateGFXObject", RpcTarget.OthersBuffered, active);
+        EventManager.DispatchEvent(GameEvent.CAR_DESTROY, playerID);
     }
 
     [PunRPC]
